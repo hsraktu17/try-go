@@ -7,6 +7,7 @@ import (
 
 func main() {
 	array1()
+	array()
 }
 
 func area() {
