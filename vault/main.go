@@ -3,19 +3,23 @@ package main
 import "fmt"
 
 func main() {
-	var x int
-	fmt.Println("Enter the number")
-	fmt.Scanln(&x)
 
-	if x > 10 {
-		fmt.Println("Dont know what to do")
-	} else {
-		fmt.Println("knows what to do")
+	for i := 0; i < 3; i++ {
+		fmt.Println(i)
 	}
 
-	if y := 1; y > 5 {
-		fmt.Println("Hello")
-	} else {
-		fmt.Println("not hello")
+	var k int
+	for k < 5 {
+		fmt.Println("looping....")
+		k++
+	}
+
+	count := 0
+	for {
+		fmt.Println("KL")
+		count++
+		if count == 1 {
+			break
+		}
 	}
 }
