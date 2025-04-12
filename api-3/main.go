@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,7 @@ func main() {
 	{
 		v1.POST("/users", createUser)
 		v1.GET("/users", getUsers)
+		v1.GET("/users/:id", getUserById)
 	}
 
 	router.Run(":8000")
@@ -48,4 +50,16 @@ func createUser(c *gin.Context) {
 
 func getUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, users)
+}
+
+func getUserById(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	for _, user := range users {
+		if user.ID == id {
+			c.JSON(http.StatusOK, user)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 }
