@@ -9,8 +9,8 @@ import (
 
 type User struct {
 	ID   int    `json:"id"`
-	Name string `json:"name" binding:"requied,min=2"`
-	Age  int    `json:"age" binding:"required,get=18,lte=100"`
+	Name string `json:"name" binding:"required,min=2"`
+	Age  int    `json:"age" binding:"required,gte=18,lte=100"`
 }
 
 var (
@@ -25,6 +25,7 @@ func main() {
 	v1 := router.Group("/api/v1")
 	{
 		v1.POST("/users", createUser)
+		v1.GET("/users", getUsers)
 	}
 
 	router.Run(":8000")
@@ -43,4 +44,8 @@ func createUser(c *gin.Context) {
 	mu.Unlock()
 
 	c.JSON(http.StatusCreated, user)
+}
+
+func getUsers(c *gin.Context) {
+	c.JSON(http.StatusOK, users)
 }
