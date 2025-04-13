@@ -28,6 +28,7 @@ func main() {
 		v1.POST("/users", createUser)
 		v1.GET("/users", getUsers)
 		v1.GET("/users/:id", getUserById)
+		v1.PUT("/users/:id", updateUserById)
 	}
 
 	router.Run(":8000")
@@ -62,4 +63,27 @@ func getUserById(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
+}
+
+func updateUserById(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+	var updateUser User
+
+	if err := c.BindJSON(&updateUser); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	for i, user := range users {
+		if user.ID == id {
+			updateUser.ID = id
+			users[i] = updateUser
+			c.JSON(http.StatusOK, updateUser)
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 }
