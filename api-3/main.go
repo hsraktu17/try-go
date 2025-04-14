@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"sync"
 
+	"slices"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -96,7 +98,7 @@ func deleteUser(c *gin.Context) {
 	defer mu.Unlock()
 	for i, user := range users {
 		if user.ID == id {
-			users = append(users[:i], users[i+1:]...)
+			users = slices.Delete(users, i, i+1)
 			c.JSON(http.StatusBadRequest, gin.H{"message": "user Deleted"})
 			return
 		}
