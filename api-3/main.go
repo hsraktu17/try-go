@@ -28,7 +28,8 @@ func main() {
 		v1.POST("/users", createUser)
 		v1.GET("/users", getUsers)
 		v1.GET("/users/:id", getUserById)
-		v1.PUT("/users/:id", updateUserById)
+		v1.PUT("/users/:id", updatedUser)
+		v1.DELETE("/users/:id", deleteUser)
 	}
 
 	router.Run(":8000")
@@ -65,7 +66,7 @@ func getUserById(c *gin.Context) {
 	c.JSON(http.StatusNotFound, gin.H{"message": "User not found"})
 }
 
-func updateUserById(c *gin.Context) {
+func updatedUser(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 	var updateUser User
 
@@ -85,5 +86,20 @@ func updateUserById(c *gin.Context) {
 			return
 		}
 	}
-	c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+	c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+}
+
+func deleteUser(c *gin.Context) {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	mu.Lock()
+	defer mu.Unlock()
+	for i, user := range users {
+		if user.ID == id {
+			users = append(users[:i], users[i+1:]...)
+			c.JSON(http.StatusBadRequest, gin.H{"message": "user Deleted"})
+			return
+		}
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 }
