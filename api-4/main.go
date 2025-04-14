@@ -27,6 +27,7 @@ func main() {
 
 	{
 		v1.POST("/users", userCreate)
+		v1.GET("/users", getUsers)
 	}
 
 	router.Run(":8000")
@@ -55,7 +56,19 @@ func userCreate(c *gin.Context) {
 	c.JSON(http.StatusCreated, user)
 }
 
+func getUsers(c *gin.Context) {
+	data, err := os.ReadFile("user.txt")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	c.String(http.StatusOK, string(data))
+}
+
 func appendToFile(filename, text string) error {
+	if text[len(text)-1] != '\n' {
+		text += "\n"
+	}
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
