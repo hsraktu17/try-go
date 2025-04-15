@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +31,7 @@ func main() {
 	{
 		v1.POST("/users", userCreate)
 		v1.GET("/users", getUsers)
+		v1.GET("/users/:ID", getUserById)
 	}
 
 	router.Run(":8000")
@@ -61,8 +65,48 @@ func getUsers(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
+	log.Println("data log", string(data))
 
 	c.String(http.StatusOK, string(data))
+}
+
+func getUserById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("ID"))
+	log.Println("Get id params", id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		return
+	}
+
+	data, err := os.ReadFile("user.txt")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	log.Println("Get all the user data", string(data))
+	lines := strings.Split(string(data), "\n")
+	for _, line := range lines {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+
+		var u User
+		log.Println("user: ", u)
+		dmf, err := fmt.Sscanf(line, "ID: %d, Name: %s, Age: %d", &u.ID, &u.Name, &u.Age)
+		log.Println("rest of the data", dmf)
+		log.Println("users: ", u.ID == id)
+		log.Println("error", err.Error())
+		if err != nil {
+			continue
+		}
+
+		if u.ID == id {
+			c.JSON(http.StatusOK, u)
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 }
 
 func appendToFile(filename, text string) error {
