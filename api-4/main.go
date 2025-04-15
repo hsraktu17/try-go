@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -91,12 +92,9 @@ func getUserById(c *gin.Context) {
 		}
 
 		var u User
-		log.Println("user: ", u)
-		dmf, err := fmt.Sscanf(line, "ID: %d, Name: %s, Age: %d", &u.ID, &u.Name, &u.Age)
-		log.Println("rest of the data", dmf)
-		log.Println("users: ", u.ID == id)
-		log.Println("error", err.Error())
+		err := json.Unmarshal([]byte(line), &u)
 		if err != nil {
+			log.Println("Error parsing user data:", line, err)
 			continue
 		}
 
