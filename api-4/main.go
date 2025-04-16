@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -91,8 +90,22 @@ func getUserById(c *gin.Context) {
 			continue
 		}
 
+		parts := strings.Split(line, ", ")
+		if len(parts) != 3 {
+			log.Println("Malformed line:", line)
+			continue
+		}
+
 		var u User
-		err := json.Unmarshal([]byte(line), &u)
+		_, err := fmt.Sscanf(parts[0], "ID: %d", &u.ID)
+		if err != nil {
+			log.Println("Error parsing ID:", err)
+			continue
+		}
+		u.Name = strings.TrimPrefix(parts[1], "Name: ")
+		ageStr := strings.TrimPrefix(parts[2], "Age: ")
+		u.Age, err = strconv.Atoi(ageStr)
+
 		if err != nil {
 			log.Println("Error parsing user data:", line, err)
 			continue
