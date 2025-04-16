@@ -32,6 +32,7 @@ func main() {
 		v1.POST("/users", userCreate)
 		v1.GET("/users", getUsers)
 		v1.GET("/users/:ID", getUserById)
+		v1.PUT("/users/:ID", updateUserById)
 	}
 
 	router.Run(":8000")
@@ -118,6 +119,31 @@ func getUserById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+}
+
+func updateUserById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": "invalid ID"})
+		return
+	}
+
+	var updatedUser User
+	if err := c.BindJSON(&updatedUser); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	}
+
+	data, err := os.ReadFile("user.txt")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error reading the file"})
+		return
+	}
+
+	lines := strings.Split(string(data), "\n")
+	for _, line = range lines {
+
+	}
+
 }
 
 func appendToFile(filename, text string) error {
